@@ -1,14 +1,23 @@
-const Sequelize = require('sequelize');
+const mongodb = require("mongodb");
+const getDb = require("../util/database").getDb;
 
-const sequelize = require('../util/database');
-
-const Cart = sequelize.define('cart', {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true
+class Cart {
+  constructor(id) {
+    this._id = id ? new mongodb.ObjectId(id) : null;
+    this.items = [];
   }
-});
+
+  save() {
+    const db = getDb();
+    return db.collection("carts").insertOne(this);
+  }
+
+  static findById(cartId) {
+    const db = getDb();
+    return db
+      .collection("carts")
+      .findOne({ _id: new mongodb.ObjectId(cartId) });
+  }
+}
 
 module.exports = Cart;
